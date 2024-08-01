@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Ecosystem Simulator</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+        h1 { color: #333; }
+        form { margin-bottom: 20px; }
+        input[type="text"], select, button { margin: 5px 0; padding: 5px; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #f4f4f4; margin: 5px 0; padding: 10px; }
+        #analysis { background: #e9e9e9; padding: 15px; margin-top: 20px; }
+        #led-control { margin-top: 20px; }
+        #led-control button { margin-right: 10px; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Future Ecosystem Simulator</h1>
+    
+    <form method="POST">
+        <input type="text" name="idea" placeholder="Enter your idea" required>
+        <select name="category" required>
+            <option value="Environment">Environment</option>
+            <option value="Technology">Technology</option>
+            <option value="Society">Society</option>
+            <option value="Culture">Culture</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Ideas</h2>
+    <ul>
+    {% for idea in ideas %}
+        <li>
+            {{ idea[1] }} - {{ idea[2] }} ({{ idea[3] }})
+            <form method="POST" action="{{ url_for('delete_idea', id=idea[0]) }}" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+
+    <div id="analysis">
+        <h2>Analysis</h2>
+        <h3>Common Words</h3>
+        <ul>
+        {% for word, count in analysis_results['common_words'] %}
+            <li>{{ word }}: {{ count }}</li>
+        {% endfor %}
+        </ul>
+
+        <h3>Category Counts</h3>
+        <ul>
+        {% for category, count in analysis_results['category_counts'].items() %}
+            <li>{{ category }}: {{ count }}</li>
+        {% endfor %}
+        </ul>
+
+        <h3>Time Distribution</h3>
+        <ul>
+        {% for hour, count in analysis_results['time_distribution'].items() %}
+            <li>{{ hour }}:00 - {{ count }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <div id="led-control">
+        <h2>LED Control</h2>
+        <button onclick="changeLED('Environment')">Environment</button>
+        <button onclick="changeLED('Technology')">Technology</button>
+        <button onclick="changeLED('Society')">Society</button>
+        <button onclick="changeLED('Culture')">Culture</button>
+    </div>
+
+    <script>
+    function changeLED(category) {
+        fetch('/change_led', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({category: category}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                console.log('LED pattern changed to ' + category);
+                alert('LED pattern changed to ' + category);
+            }
+        });
+    }
+    </script>
+</body>
+</html>
